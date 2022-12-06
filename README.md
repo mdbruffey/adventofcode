@@ -1,0 +1,1 @@
+This is my (probably) poorly structure repository for my Advent of Code solutions.
