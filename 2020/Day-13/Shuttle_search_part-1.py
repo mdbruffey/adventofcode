@@ -26,7 +26,6 @@ with open("input.txt") as file:
 least = [1000,0]
 for i, bus in enumerate(buses):
     if bus == "x":
-        buses[i] = 1
         continue
     wait = find_wait_time(depart, int(bus))
     if wait < least[0]:
@@ -36,15 +35,28 @@ for i, bus in enumerate(buses):
 print(f"You can catch bus #{least[1]} in {least[0]} minutes.")
 print(int(least[0])*int(least[1]))
 
-print(extended_gcd(5,11))
-"""
-buses = list(map(int, buses))
-time = 0
-inc = max(buses)
-while True:
-    if all([(time + i)%bus == 0 for i, bus in enumerate(buses)]):
-        break
-    time += buses[0]
+bus_dict = {}
+for i, bus in enumerate(buses):
+    if bus != "x":
+        bus_dict[int(bus)] = i
 
-print(time)
-"""
+buses = list(bus_dict.keys())
+p1 = buses[0]
+phi1 = bus_dict[p1]
+for i in range(1,len(buses)):
+    p2 = buses[i]
+    p3 = lcm(p1,p2)
+    phi2 = bus_dict[p2]
+    g, s, t = extended_gcd(p1, p2)
+    z = (phi1 - phi2)//g
+    m = int(z*s)
+    phi3 = (-m*p1 + phi1)%p3
+    p1 = p3
+    phi1 = phi3
+
+print(p1-phi1)
+
+
+
+
+        
