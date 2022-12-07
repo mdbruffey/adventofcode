@@ -34,12 +34,6 @@ class File:
     def get_size(self):
         return self.size
 
-def part1(data):
-    pass
-
-def part2(data):
-    data = data.split("\n")
-    return
 
 with open("input.txt") as file:
     data = file.read()
