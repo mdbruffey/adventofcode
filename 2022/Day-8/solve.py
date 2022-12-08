@@ -3,10 +3,13 @@ def is_hidden(i, j, trees):
     #check up
     if all([int(tree) < house for tree in [item[j] for item in trees[:i]]]):
         return False
+    #check down
     if all([int(tree) < house for tree in [item[j] for item in trees[i+1:]]]):
         return False
+    #check left
     if all([int(tree) < house for tree in trees[i][:j]]):
         return False
+    #check right
     if all([int(tree) < house for tree in trees[i][j+1:]]):
         return False
     return True
@@ -23,7 +26,7 @@ def view_distance(i, j, trees):
         dy, dx = direction
         x = j + dx
         y = i + dy
-        while not any([y < 0,y == len(trees),x<0,x==len(trees[0])]):
+        while not any([y < 0,y == len(trees),x < 0,x == len(trees[0])]):
             if int(trees[y][x]) < house:
                 count += 1
             else:
