@@ -1,55 +1,7 @@
 class Rope:
-    def __init__(self):
-        self.head = (0,0)
-        self.tail = (0,0)
-        self.locations = [(0,0)]
-
-    def move_h(self, string):
-        direc, dist = string.split(" ")
-        x, y = self.head
-        match direc:
-            case "U":
-                y += int(dist)
-            case "R":
-                x += int(dist)
-            case "D":
-                y -= int(dist)
-            case "L":
-                x -= int(dist)
-        self.head = (x,y)
-        self.update_y()
-
-    def update_y(self):
-        x, y = self.tail
-        while self.distance(x,y) > 1:
-            dx = self.head[0]-x
-            dy = self.head[1]-y
-            if dx != 0:
-                x += (dx)/abs(dx)
-            if dy != 0:
-                y += (dy)/abs(dy)
-            self.locations.append((x,y))
-        self.tail = x, y
-
-    def distance(self, x, y):
-        x = abs(self.head[0]-x)
-        y = abs(self.head[1]-y)
-        if x > y:
-            return x
-        return y
-
-    def get_num_locations(self):
-        return len(set(self.locations))
-
-def part1(data):
-    directions = data.split("\n")
-    rope = Rope()
-    for direction in directions:
-        rope.move_h(direction)
-    return rope.get_num_locations()
-
-class Rope2:
     def __init__(self, knots):
+        if knots < 2:
+            knots = 2
         self.knots = [(0,0) for x in range(knots)]
         self.locations = [(0,0)]
 
@@ -93,9 +45,16 @@ class Rope2:
     def get_num_locations(self):
         return len(set(self.locations))
 
+def part1(data):
+    directions = data.split("\n")
+    rope = Rope(2)
+    for direction in directions:
+        rope.move_h(direction)
+    return rope.get_num_locations()
+
 def part2(data):
     directions = data.split("\n")
-    rope = Rope2(10)
+    rope = Rope(10)
     for direction in directions:
         rope.move_h(direction)
     
