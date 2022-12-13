@@ -1,32 +1,19 @@
+import ast
+
 def is_ordered(pair):
-    left, right = pair.split("\n")
-    left = left.strip("][").split(",")
-    print(left)
-    right = right.strip("][").split(",")
-    print(right)
-    print("\n")
-    if len(left) > len(right):
-        return False
-    for i in range(len(left)):
-        if type(left[i]) != list and type(right[i]) != list:
-            if  left[i] > right [i]:
-                return False
-        elif type(left[i]) == list and type(right[i]) != list:
-            if left[i][0] > right[i]:
-                return False
-        elif type(left[i]) != list and type(right[i]) == list:
-            if left[i] > right[i][0]:
-                return False
-        else:
-            for j in range(left[i]):
-                if left[i][j] > right[i][j]:
-                    return False
-                elif left[i][j] < right[i][j]:
-                    return True
+    
+        
     return True
 
 def part1(data):
-    pairs = data.split("\n\n")
+    data = data.split("\n\n")
+    pairs = []
+    for i, pair in enumerate(data):
+        left, right = pair.split("\n")
+        left = ast.literal_eval(left)
+        right = ast.literal_eval(right)
+        pairs.append((left,right))
+        
     ordered = []
     for pair in pairs:
         ordered.append(is_ordered(pair))
