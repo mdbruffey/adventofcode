@@ -1,23 +1,24 @@
 def is_ordered(pair):
     left, right = pair
     for i in range(0, min([len(left),len(right)])):
-        if left[i] == right[i]:
+        t_i = left[i]
+        t_r = right[i]
+        if type( t_i) == list and type(t_r) != list:
+            t_r = [t_r]
+        if type (t_i) != list and type(t_r) == list:
+             t_i = [ t_i]
+        if  t_i == t_r:
             continue
-        elif type(left[i]) == int and type(right[i]) == int:
-            if left[i] > right[i]:
+        elif type( t_i) == int and type(t_r) == int:
+            if  t_i > t_r:
                 return False
-            elif left[i] < right[i]:
+            elif  t_i < t_r:
                 return True
-        elif type(left[i]) == list and type(right[i]) != list:
-            return is_ordered((left[i],[right[i]]))
-        elif type(left[i]) != list and type(right[i]) == list:
-            return is_ordered(([left[i]],right[i]))
         else:
-            return is_ordered((left[i],right[i]))
+            return is_ordered(( t_i,t_r))
             
     if len(left) > len(right):
-        return False
-        
+        return False        
     return True
 
 def part1(data):
