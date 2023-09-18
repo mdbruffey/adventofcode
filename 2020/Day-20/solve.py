@@ -4,25 +4,26 @@ class Tile:
     def __init__(self, t_id, t_image):
         self.image = t_image
         self.id = t_id
-        self.sides = self.get_sides()
+        self.get_sides()
         self.is_corner = False
     
     def get_sides(self):
-        sides = [self.image[0], self.image[-1]]
+        self.sides = {"top" : self.image[0], 
+                      "bottom" :self.image[-1]}
         left = ""
         right = ""
         for row in self.image:
             left += row[0]
             right += row[-1]
-        sides.extend([left, right])
-        return sides
+        self.sides["left"]= left
+        self.sides["right"] = right
 
     def find_matches(self, tiles):
         matches = 0
         for tile in tiles:
             if tile.id == self.id:
                 continue
-            for side in tile.sides:
+            for key,side in tile.sides.items():
                 if side in self.sides or side[::-1] in self.sides:
                     matches += 1
             if matches >= 3:
@@ -66,7 +67,7 @@ def part1(data):
 
     tile = tiles[0]
     print(tile)
-    tile.transpose("left", True)
+    tile.transpose("left", True )
     print(tile)
     return value
 
