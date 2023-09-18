@@ -1,3 +1,5 @@
+import numpy
+
 class Tile:
     def __init__(self, t_id, t_image):
         self.image = t_image
@@ -28,6 +30,25 @@ class Tile:
         print(f"Tile {self.id}: {matches} matches")
         self.is_corner = True
         return
+    
+    def transpose(self, direction="left", flip=False):
+        if direction == "left":
+            if flip:
+                self.image = [[row[i] for row in self.image[::-1]] for i in range(len(self.image[0])-1,-1, -1)]
+            else:
+                self.image = [[row[i] for row in self.image] for i in range(len(self.image[0])-1, -1, -1)]
+        elif direction =="right":
+            if flip:
+                self.image = [[row[i] for row in self.image] for i in range(len(self.image[0]))]
+            else:
+                self.image = [[row[i] for row in self.image[::-1]] for i in range(len(self.image[0]))]
+        return
+    
+    def __str__(self):
+        string = f"Tile: {self.id}"
+        for row in self.image:
+            string += "\n" + "".join(row)
+        return string
 
 def part1(data):
     raw = data.split("\n\n")
@@ -42,6 +63,11 @@ def part1(data):
         tile.find_matches(tiles)
         if tile.is_corner:
             value *= tile.id
+
+    tile = tiles[0]
+    print(tile)
+    tile.transpose("left", True)
+    print(tile)
     return value
 
 def part2(data):
