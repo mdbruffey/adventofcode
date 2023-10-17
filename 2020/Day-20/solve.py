@@ -19,30 +19,56 @@ class Tile:
         self.sides["right"] = right
 
     def find_matches(self, tiles):
+        self.neighbors = {"top": None,
+                          "right": None,
+                          "bottom": None,
+                          "left": None}
         matches = 0
         for tile in tiles:
             if tile.id == self.id:
                 continue
-            for key,side in tile.sides.items():
-                if side in self.sides or side[::-1] in self.sides:
-                    matches += 1
-            if matches >= 3:
-                return
+            for dir, side in tile.sides.items():
+                for d, s in self.sides.items():
+                    if side == s or side[::-1] == s:
+                        self.neighbors[dir] = tile
+                        matches += 1
+                        break
+        if matches >= 3:
+            return
         print(f"Tile {self.id}: {matches} matches")
         self.is_corner = True
         return
     
     def transpose(self, direction="left", flip=False):
+        new_neighbors = {}
         if direction == "left":
+            new_neighbors["top"] = self.neighbors["right"]
+            new_neighbors["right"] = self.neighbors["bottom"]
+            new_neighbors["bottom"] = self.neighbors["left"]
+            new_neighbors["left"] = self.neighbors["top"]
             if flip:
                 self.image = [[row[i] for row in self.image[::-1]] for i in range(len(self.image[0])-1,-1, -1)]
+                new_neighbors["left"], new_neighbors["right"] = new_neighbors["right"], new_neighbors["left"]
             else:
                 self.image = [[row[i] for row in self.image] for i in range(len(self.image[0])-1, -1, -1)]
         elif direction =="right":
+            new_neighbors["top"] = self.neighbors["left"]
+            new_neighbors["right"] = self.neighbors["top"]
+            new_neighbors["bottom"] = self.neighbors["right"]
+            new_neighbors["left"] = self.neighbors["bottom"]
             if flip:
                 self.image = [[row[i] for row in self.image] for i in range(len(self.image[0]))]
+                new_neighbors["left"], new_neighbors["right"] = new_neighbors["right"], new_neighbors["left"]
             else:
                 self.image = [[row[i] for row in self.image[::-1]] for i in range(len(self.image[0]))]
+        elif direction == "none" and flip:
+            new_neighbors["top"] = self.neighbors["top"]
+            new_neighbors["right"] = self.neighbors["left"]
+            new_neighbors["bottom"] = self.neighbors["bottom"]
+            new_neighbors["left"] = self.neighbors["right"]
+            self.image = [[row[i] for i in range(len(self.image[0])-1,-1,-1)] for row in self.image]
+
+        self.neighbors = new_neighbors
         return
     
     def __str__(self):
@@ -50,6 +76,36 @@ class Tile:
         for row in self.image:
             string += "\n" + "".join(row)
         return string
+
+def assemble_row(start):
+    row = [start]
+    curr = start
+    next = start.neighbors["right"]
+    while next != None:
+        for dir, side in next.sides.items():
+            if curr.sides["right"] == side:
+                if dir == "top":
+                    next.transpose("right", True)
+                elif dir == "right":
+                    next.transpose("none", True)
+                elif dir == "bottom":
+                    next.transpose("right")
+            elif curr.sides["right"] == side[::-1]:
+                if dir == "top":
+                    next.transpose("left")
+                elif dir == "right":
+                    next.transpose("left")
+                    next.transpose("left")
+                elif dir == "bottom":
+                    next.transpose("left", True)
+                elif dir == "left":
+                    next.transpose("right", True)
+                    next.tranpose("left")
+
+        row.append(next)
+        curr = next
+        next = curr.neighbors["right"]
+    return row
 
 def part1(data):
     raw = data.split("\n\n")
@@ -65,14 +121,26 @@ def part1(data):
         if tile.is_corner:
             value *= tile.id
 
-    tile = tiles[0]
-    print(tile)
-    tile.transpose("left", True )
-    print(tile)
     return value
 
 def part2(data):
-    pass
+    raw = data.split("\n\n")
+    tiles = []
+    for tile in raw:
+        t_id, info = tile.split(":")
+        t_id = int(t_id.split()[1])
+        t_image = info.split("\n")[1:]
+        tiles.append(Tile(t_id,t_image))
+    corners = []
+    for tile in tiles:
+        tile.find_matches(tiles)
+        if tile.is_corner:
+            corners.append(tile)
+    for corner in corners:
+        if corner.neighbors["top"] == None and corner.neighbors["left"] == None:
+            start = corner
+    row = assemble_row(start)
+    print(len(row))
 
 with open("input.txt") as file:
     data = file.read()
