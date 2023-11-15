@@ -1,45 +1,43 @@
-def push(item, container, depth):
-    while depth:
-        container= container[-1]
-        depth -= 1
-    container.append(item)
-
-def parse_parentheses(line):
-    container = []
-    depth = 0
-    for char in line:
-        if char == "(":
-            push([], container, depth)
-            depth += 1
-        elif char == ")":
-            depth -= 1
-        elif char == " ":
+def parse_rules(data):
+    rules = {}
+    for line in data:
+        alts = []
+        rid, raw = line.split(": ")
+        print(raw)
+        if raw.strip('"') in "ab":
+            rules[rid] = raw.strip('"')
             continue
-        else:
-            push(char, container, depth)
-    return container
+        raw = raw.split(" | ")
+        for alt in raw:
+            alts.append(alt.split())
+        rules[rid] = alts
+    return rules
+
+def matches_rule(m, rule, rules):
+    if isinstance(rules[rule], str):
+        return m[0] == rules[rule]
+    
+    for alt in rules[rule]:
+        i = 0
+        for sub in alt:
+            if not matches_rule(m[i:], sub, rules):
+                i += len(sub)
+            else:
+                return True
+    return False
+        
 
 def part1(data):
     rules, messages = data.split("\n\n")
     rules = rules.split("\n")
     messages = messages.split("\n")
-    rdict = {}
-    for rule in rules:
-            rid, r = rule.split(": ")
-            rdict[rid] = r.strip('"')
-    
-    rstring = rdict["0"]
-    i = 0
-    while i < len(rstring):
-        if rstring[i] not in "ab |()":
-            sub = f"({rdict[rstring[i]]})"
-            if len(sub) == 3:
-                sub = sub.strip(")(")
-            rstring = f"{rstring[:i]}{sub}{rstring[i+1:]}"
-        else:
-            i += 1
-    rlist = parse_parentheses(rstring)
-    print(rlist)
+    rules = parse_rules(rules)
+    print(rules)
+    count = 0
+    for message in messages:
+        if matches_rule(message, "0", rules):
+            count += 1
+    return count
 	
 def part2(data):
     pass
