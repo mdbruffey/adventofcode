@@ -12,7 +12,7 @@ def part2(key):
     i = 1
     while True:
         result = hashlib.md5((key+str(i)).encode())
-        if result.hexdigest()[:5] == "000000":
+        if result.hexdigest()[:6] == "000000":
             return i
         i += 1
 
