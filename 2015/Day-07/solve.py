@@ -1,39 +1,57 @@
-def execute(operation, target, wires):
-    print(operation)
+def get_value(wire, wires):
+    operation = wires[wire]
     if operation.isnumeric():
-        wires[target] = int(operation)
+        value = int(operation)
     elif "AND" in operation:
         left, right = operation.split(" AND ")
-        wires[target] = wires[left] & wires[right]
+        if left.isnumeric():
+            value = int(left) & get_value(right, wires)
+        elif right.isnumeric():
+            value = get_value(left, wires) & int(right)
+        else:
+            value = get_value(left, wires) & get_value(right, wires)
     elif "OR" in operation:
         left, right = operation.split(" OR ")
-        wires[target] = wires[left] | wires[right]
+        if left.isnumeric():
+            value = int(left) | get_value(right, wires)
+        elif right.isnumeric():
+            value = get_value(left, wires) | int(right)
+        else:
+            value = get_value(left, wires) | get_value(right, wires)
     elif "RSHIFT" in operation:
         left, right = operation.split(" RSHIFT ")
-        wires[target] = wires[left] >> int(right)
+        value = get_value(left, wires) >> int(right)
     elif "LSHIFT" in operation:
         left, right = operation.split(" LSHIFT ")
-        wires[target] = wires[left] << int(right)
+        value = get_value(left, wires) << int(right)
     elif "NOT" in operation:
         wire = operation.split()[-1]
-        wires[target] = 65536 + ~wires[wire]
-    return wires
+        value = 65536 + ~get_value(wire, wires)
+    else:
+        value = get_value(operation, wires)
+
+    wires[wire] = str(value)
+    return value
 
 def part1(data):
     wires = {}
     for line in data:
-        left, target = line.split(" -> ")
-        wires = execute(left, target.strip("\n"), wires)
-    print(wires)
-    return wires["x"]
+        operation, target = line.split(" -> ")
+        wires[target.strip("\n")] = operation
+    return get_value("a", wires)
 
-def part2(data):
-    pass
+def part2(data, res1):
+    wires = {}
+    for line in data:
+        operation, target = line.split(" -> ")
+        wires[target.strip("\n")] = operation
+    wires["b"] = str(res1)
+    return get_value("a", wires)
 
 with open("input.txt") as file:
     data = file.readlines()
 
 
 res1 = part1(data)
-res2 = part2(data)
+res2 = part2(data, res1)
 print(f"Part 1: {res1}\nPart 2: {res2}")
