@@ -1,3 +1,5 @@
+import ast
+
 def countList(item, p2 = False):
     count = 0
     for item in item:
@@ -24,11 +26,11 @@ def countDict(item, p2 = False):
     return count
 
 def part1(data):
-    thing = eval(data)
+    thing = ast.literal_eval(data)
     return countList(thing)
 
 def part2(data):
-    thing = eval(data)
+    thing = ast.literal_eval(data)
     return countList(thing, True)
 
 with open("input.txt") as file:
