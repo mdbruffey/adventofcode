@@ -24,18 +24,36 @@ def calc_presents(n):
         count += sum(map(lambda x: math.prod(x),set(combos)))
     return count * 10
 
+def calc_presents_2(n):
+    factors = get_factors(n)
+    new_factors = []
+    for i in range(2,len(factors)):
+        combos = itertools.combinations(factors, i)
+        new_factors.extend(list(map(lambda x: math.prod(x),set(combos))))
+    factors.extend(new_factors)
+    factors = set(factors)
+    count = 1 + n
+    for factor in factors:
+        if 50 * factor > n:
+            count += factor
+    return count*11
+
 
 def part1(data):
-    n = 100
+    n = 786200
     presents = 0
     while presents < data:
         n +=1
         presents = calc_presents(n)
-    print(presents)
     return n
 
 def part2(data):
-    pass
+    n = 1000
+    presents = 0
+    while presents < data:
+        n +=1
+        presents = calc_presents_2(n)
+    return n
 
 with open("input.txt") as file:
     data = int(file.read())
