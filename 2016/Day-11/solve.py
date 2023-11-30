@@ -51,10 +51,12 @@ def find_moves(state):
     for i in range(1,5):
         if i == floor:
             continue
-        for index in items:
-            moves.append((i-floor, index))
-        for index in itertools.combinations(items,2):
-            moves.append((i-floor,index[0],index[1]))
+        if i-floor > -3:
+            for index in items:
+                moves.append((i-floor, index))
+        if i-floor > -2:
+            for index in itertools.combinations(items,2):
+                moves.append((i-floor,index[0],index[1]))
     return moves
 
 def part1(initial_state, target, rtgs):
@@ -119,7 +121,6 @@ target_state = []
 for i in range(len(rtgs)+1):
     target_state.append(4)
 target_state = tuple(target_state)
-print(rtgs)
 
 start = time.perf_counter()
 res1 = part1(initial_state, target_state, rtgs)
