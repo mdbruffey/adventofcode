@@ -61,8 +61,7 @@ def part1(initial_state, target, rtgs):
     queue = [initial_state]
     visited = set()
     min_distance = 1000
-    criteria = distance_from_target(initial_state, target) // 10
-    print(criteria)
+    criteria = 3
     while queue:
         state = queue.pop(0)
         if state[:-1] == target:
