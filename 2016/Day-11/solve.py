@@ -1,67 +1,83 @@
 import time
-import random
+import itertools
 
-def reset(data):
-    floors = {}
-    for key, value in data.items():
-        new = []
-        for item in value:
-            new.append(item)
-        floors[key] = new
-    return floors
+def distance_from_target(state, target):
+    count = 0
+    for i in range(1,len(state[1:-1])):
+        count += target[i]-state[i]
+    return count
 
-def is_fried(chip, floor, elevator, floors):
+def is_fried(chip, items):
     flavor = chip.split("-")[0]
-    for item in floors[floor] + elevator:
+    for item in items:
         if flavor in item and item != chip:
             return False
-    for item in floors[floor] + elevator:
-        if "g" in item:
+    for item in items:
+        if "-g" in item:
             return True
     return False
 
-def do_random_action(elevator, floor, floors):
-    for i in range(len(elevator)):
-        if random.randint(0,1):
-            floors[floor].append(elevator.pop(random.choice(range(len(elevator)))))
-    for i in range(2-len(elevator)):
-        if random.randint(0,1):
-            if len(floors[floor]):
-                elevator.append(floors[floor].pop(random.choice(range(len(floors[floor])))))
-    if not len(elevator):
-        elevator.append(floors[floor].pop(random.choice(range(len(floors[floor])))))
-    new_floor = random.choice([x+1 for x in range(4) if x+1 != floor])
-    for i in range(floor, new_floor, int((new_floor-floor)/abs(new_floor-floor))):
-        for item in floors[i] + elevator:
-            if "-m" in item:
-                if is_fried(item, i, elevator, floors):
-                    print(f"Something fried...")
-                    return -1
-    return new_floor
+def make_move(move, state, rtgs):
+    #print(f"Making move {move} from {state}")
+    shift = move[0]
+    direction = int(shift/abs(shift))
+    floor = state[0]
+    target_floor = floor + shift
+    steps = state[-1]
 
-def part1(data):
-    total_items = sum([len(x) for x in data.values()])
-    print(total_items)
-    min_steps = 10000
-    for i in range(1):
-        floors = reset(data)
-        print(f"Attempt {i}: ",end="")
-        steps = 0
-        elevator = []
-        curr_floor = 1
-        while True:
-            if steps > min_steps:
-                break
-            if len(floors[4]) == total_items:
-                break
-            curr_floor = do_random_action(elevator, curr_floor, floors)
-            if curr_floor < 1:
-                steps = 1000000
-            steps += 1
-        if steps < min_steps:
-            min_steps = steps
+    for i in range(floor+direction, target_floor + direction, direction):
+        steps += 1
+        items = [key for key in rtgs if state[rtgs[key]]==i or rtgs[key] in move[1:]]
+        #print(f"{items} on floor {i}")
+        for item in items:
+            if "-m" in item:
+                if is_fried(item, items):
+                    #print(f"Something fried...")
+                    return None
+                
+    new = [target_floor]            
+    for i in range(1,len(rtgs)+1):
+        if i in move[1:]:
+            new.append(state[i] + shift)
+        else:
+            new.append(state[i])
+    new.append(steps)
+    return tuple(new)
+
+def find_moves(state):
+    moves = []
+    floor = state[0]
+    items = [i for i in range(1,len(rtgs)+1) if state[i] == floor]
+    for i in range(1,5):
+        if i == floor:
+            continue
+        for index in items:
+            moves.append((i-floor, index))
+        for index in itertools.combinations(items,2):
+            moves.append((i-floor,index[0],index[1]))
+    return moves
+
+def part1(initial_state, target, rtgs):
+    queue = [initial_state]
+    visited = set()
+    min_distance = 1000
+    criteria = distance_from_target(initial_state, target) // 10
+    print(criteria)
+    while queue:
+        state = queue.pop(0)
+        if state[:-1] == target:
+            return state[-1]
         
-    return min_steps
+        for move in find_moves(state):
+            next = make_move(move, state, rtgs)
+            if next and next not in visited:
+                distance = distance_from_target(next, target)
+                if distance < min_distance:
+                    min_distance = distance
+                if distance - min_distance > criteria:
+                    continue
+                queue.append(next)
+                visited.add(next)
 
 def part2(data):
     pass
@@ -73,8 +89,8 @@ num_convert = {"first": 1,
                "second": 2,
                "third": 3,
                "fourth": 4}
-
-floors = {}
+index = iter(range(100))
+rtgs = {}
 for line in data:
     floor, stuff = line.split(" floor contains ")
     floor = num_convert[floor.split()[-1]]
@@ -85,16 +101,29 @@ for line in data:
             stuff = stuff.split(" and ")
         for i, thing in enumerate(stuff):
             if "microchip" in thing:
-                stuff[i] = thing.split("-")[-2].split()[-1] + "-m"
+                thing = thing.split("-")[-2].split()[-1] + "-m"
             if "generator" in thing:
-                stuff[i] = thing.split()[-2] + "-g"
-        floors[floor] = stuff
-    else:
-        floors[floor] = []
+                thing = thing.split()[-2] + "-g"
+            rtgs[thing] = floor
 
+initial_state = [1]
+next(index)
+for item, floor in rtgs.items():
+    initial_state.append(floor)
+    rtgs[item] = next(index)
+initial_state.append(0)
+
+#state tuple lists the floors of each item and ends with the number of steps taken
+#(elevator, item 1, item 2, ..., item n, steps)
+initial_state = tuple(initial_state)
+target_state = []
+for i in range(len(rtgs)+1):
+    target_state.append(4)
+target_state = tuple(target_state)
+print(rtgs)
 
 start = time.perf_counter()
-res1 = part1(floors)
+res1 = part1(initial_state, target_state, rtgs)
 print(f"Part 1: {res1} -- {time.perf_counter()-start:.4f} s")
 start = time.perf_counter()
 res2 = part2(data)
