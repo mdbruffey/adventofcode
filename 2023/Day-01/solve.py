@@ -27,20 +27,14 @@ def part2(data):
         line = line.strip("\n")
         nums = ""
         for i in range(len(line)):
-            print(i, line)
             if line[i].isnumeric():
-                print(i, line[i])
                 nums += line[i]
             else:
                 for num in num_dict:
-                    print(num)
-                    print(line[i:len(num)])
-                    if line[i:len(num)] == num:
-                        print(num)
+                    if line[i:i+len(num)] == num:
                         nums += num_dict[num]
 
         num = int(nums[0]+nums[-1])
-        print(num)
         count += int(nums[0]+nums[-1])
     return count
 
@@ -48,8 +42,8 @@ with open("input.txt") as file:
     data = file.readlines()
 
 start = time.perf_counter()
-#res1 = part1(data)
-#print(f"Part 1: {res1} -- {time.perf_counter()-start:.4f} s")
+res1 = part1(data)
+print(f"Part 1: {res1} -- {time.perf_counter()-start:.4f} s")
 start = time.perf_counter()
 res2 = part2(data)
 print(f"Part 2: {res2} -- {time.perf_counter()-start:.4f} s")
