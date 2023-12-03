@@ -1,5 +1,6 @@
 import time
 import numpy as np
+import itertools
 
 def fix_padding(b, length, size):
     for i in range(len(b)):
@@ -12,45 +13,38 @@ def fix_padding(b, length, size):
 
 def extend(a):
     length = len(a)
-    try:
-        if length > 128:
-            a_r = a[::-1]
-            b = []
-            b.append(bin(~np.uint64(int(a_r[:64], 2)))[2:])
-            b.append(bin(~np.uint64(int(a_r[64:128], 2)))[2:])
-            b.append(bin(~np.uint64(int(a_r[128:], 2)))[192-length +2:])
-            b = fix_padding(b, length, 128)
-        elif length > 64:
-            a_r = a[::-1]
-            b= []
-            b.append(bin(~np.uint64(int(a_r[:64], 2)))[2:])
-            b.append(bin(~np.uint64(int(a_r[64:], 2)))[128-length+2:])
-            b = fix_padding(b, length, 64)
-        elif length > 32:
-            b = bin(~np.uint64(int(a[::-1], 2)))[64-length+2:]
-        else:
-            b = bin(~np.uint32(int(a[::-1], 2)))[32-length+2:]
-    except Exception as e:
-        print(e)
-        print(len(a))
-
+    a_r = a[::-1]
+    b = []
+    i = 0
+    while len(a_r) > 64:
+        b.append(bin(~np.uint64(int(a_r[:64], 2)))[2:])
+        a_r = a_r[64:]
+        i += 1
+    b.append(bin(~np.uint64(int(a_r, 2)))[64-len(a_r)+2:])
+    b = fix_padding(b, length, i*64)
     return a+"0"+b
 
+def next(a):
+    b = ''.join('0' if c == '1' else '1' for c in reversed(a))
+    return ''.join([a, "0", b])
+
 def get_checksum(data):
-    checksum = ""
+    checksum = []
     for i in range(0,len(data),2):
         if data[i] == data[i+1]:
-            checksum += "1"
+            checksum.append("1")
         else:
-            checksum += "0"
-    return checksum
+            checksum.append("0")
+    if len(checksum) % 2 != 0:
+        return ''.join(checksum)
+    else:
+        return get_checksum(checksum)
 
 def part1(data, disk_length):
     while len(data) < disk_length:
-        data = extend(data)
+        print(f"{len(data)}/{disk_length}")
+        data = next(data)
     checksum = get_checksum(data[:disk_length])
-    while len(checksum) % 2 == 0:
-        checksum = get_checksum(checksum)
 
     return checksum
 
