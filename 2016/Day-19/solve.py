@@ -1,31 +1,30 @@
 import time
-import itertools
+import numpy as np
+import collections
 
 def part1(num_elves):
-    elves = [i+1 for i in range(num_elves)]
-    dif = 0
-    while len(elves) > 1:
-        if dif == 1:
-            dif = (dif + len(elves)%2) % 2
-            elves = elves[1::2]
-        else:
-            dif = (dif + len(elves)%2) % 2
-            elves = elves[::2]
-
-    return elves[0]
+    string = bin(np.uint64(num_elves))[2:]
+    l = num_elves - 2**(len(string)-1)
+    return 2*l + 1
 
 def part2(num_elves):
-    elves = [i+1 for i in range(num_elves)]
-    index = len(elves)//2
-    i = 0
-    while len(elves) > 1:
-        i += 1
-        if len(elves) == 2:
-            elves.pop((index+1)%len(elves))
+    left = collections.deque()
+    right = collections.deque()
+    for i in range(1, num_elves+1):
+        if i < (num_elves//2) + 1:
+            left.append(i)
         else:
-            elves.pop(index)
-        index = (i%len(elves) + len(elves)//2)%len(elves)
-    return elves[0]
+            right.appendleft(i)
+
+    while left and right:
+        if len(left) > len(right):
+            left.pop()
+        else:
+            right.pop()
+        right.appendleft(left.popleft())
+        left.append(right.pop())
+
+    return left[0]
 
 with open("input.txt") as file:
     data = int(file.read())
