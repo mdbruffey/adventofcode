@@ -4,9 +4,33 @@ def part1(data):
     instructions = []
     for i in range(len(data)):
         instructions.append(int(data[i]))
+    pos = 0
+    steps = 0
+    end = len(instructions)
+    while pos < end:
+        next = pos + instructions[pos]
+        instructions[pos] += 1
+        pos = next
+        steps += 1
+    return steps
 
 def part2(data):
-    pass
+    instructions = []
+    for i in range(len(data)):
+        instructions.append(int(data[i]))
+    pos = 0
+    steps = 0
+    end = len(instructions)
+    while pos < end:
+        offset = instructions[pos]
+        next = pos + offset
+        if offset >= 3:
+            instructions[pos] -= 1
+        else:
+            instructions[pos] += 1
+        pos = next
+        steps += 1
+    return steps
 
 with open("input.txt") as file:
     data = file.readlines()
