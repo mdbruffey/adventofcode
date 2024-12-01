@@ -29,7 +29,15 @@ def get_children_weight(name, tree):
         weight += tree[child]["weight"] + get_children_weight(child, tree)
     return weight
 
-def part2(data):
+def is_unbalanced(disk, tree):
+    weights = []
+    for child in tree[disk]["dependents"]:
+        weights.append(tree[child]['weight'] + get_children_weight(child, tree))
+    if weights.count(weights[0]) == len(weights):
+        return False
+    return weights
+
+def part2(data, root):
     tree = {}
     for line in data:
         entry = {}
@@ -42,6 +50,10 @@ def part2(data):
             dependents = None
         entry["dependents"] = dependents
         tree[name] = entry
+    
+    for dependent in tree["tknk"]["dependents"]:
+        print(f"{dependent}: {tree[dependent]['weight'] + get_children_weight(dependent, tree)}")
+    print(f"{root} balanced: {not is_unbalanced(root, tree)}")
     return tree["tknk"]['weight'] + get_children_weight("tknk",tree)
 with open("input.txt") as file:
     data = file.readlines()
@@ -50,5 +62,5 @@ start = time.perf_counter()
 res1 = part1(data)
 print(f"Part 1: {res1} -- {time.perf_counter()-start:.4f} s")
 start = time.perf_counter()
-res2 = part2(data)
+res2 = part2(data, res1)
 print(f"Part 2: {res2} -- {time.perf_counter()-start:.4f} s")
