@@ -1,34 +1,12 @@
 import time
-
-def evaluate(op):
-    op = op.strip(")(")
-    try:
-        l,r = map(int,op.split(","))
-    except:
-        print(op)
-        return 0
-    return l*r
-
-def is_valid(op):
-    op = op.strip(")(")
-    if "," not in op:
-        return False
-    for char in op:
-        if not char.isnumeric() and char != ",":
-            return False
-    return True
+import re
 
 def part1(data):
-    i = data.find("mul")
+    ops = re.findall(r"mul\(\d+,\d+\)", data)
     reg = 0
-    while i >= 0:
-        data = data[i+3:]
-        e = data.find(")")
-        op = data[:e+1]
-        if is_valid(op):
-            reg += evaluate(op)
-            data = data[e+1:]
-        i = data.find("mul")
+    for op in ops:
+        x,y = map(int,op[4:-1].split(","))
+        reg += x*y
     return reg
 
 def part2(data):
