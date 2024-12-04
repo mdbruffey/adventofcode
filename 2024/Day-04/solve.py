@@ -8,7 +8,7 @@ def diagonalize(data):
 def has_x(data, i, j):
     d1 = data[i-1][j-1] + data[i+1][j+1]
     d2 = data[i-1][j+1] + data[i+1][j-1]
-    if (d1 == "MS" or d1 == "SM") and (d1 == d2 or d1[-1::-1] == d2):
+    if (d1 == "MS" or d1 == "SM") and (d2 == "MS" or d2 == "SM"):
         return True
     return False
 
@@ -17,19 +17,19 @@ def part1(data):
     key = "XMAS"
     count = 0
     for line in data:
-        count += line.count(key) + line[-1::-1].count(key)
+        count += line.count(key) + line[::-1].count(key)
     #Transpose word grid
     transpose = ["".join([line[x] for line in data]) for x in range(len(data[0]))]
     for line in transpose:
-        count += line.count(key) + line[-1::-1].count(key)
+        count += line.count(key) + line[::-1].count(key)
     #Create forward diagonal \
     diagonal = diagonalize(data)
     for line in diagonal:
-        count += line.count(key) + line[-1::-1].count(key)
+        count += line.count(key) + line[::-1].count(key)
     #Create backward diagonal /
-    diagonal = diagonalize(data[-1::-1])
+    diagonal = diagonalize(data[::-1])
     for line in diagonal:
-        count += line.count(key) + line[-1::-1].count(key)
+        count += line.count(key) + line[::-1].count(key)
     return count
 
 def part2(data):
