@@ -1,16 +1,14 @@
 import time
 
 def diagonalize(data):
-    diagonal = ["".join([data[i][j+i] for i in range(len(data)-j)]) for j in range(len(data))][-1::-1]
+    diagonal = ["".join([data[i][j+i] for i in range(len(data)-j)]) for j in range(len(data))][::-1]
     diagonal += ["".join([data[j+i][i] for i in range(len(data)-j)]) for j in range(1,len(data))]
     return diagonal
 
 def has_x(data, i, j):
     d1 = data[i-1][j-1] + data[i+1][j+1]
     d2 = data[i-1][j+1] + data[i+1][j-1]
-    if (d1 == "MS" or d1 == "SM") and (d2 == "MS" or d2 == "SM"):
-        return True
-    return False
+    return d1 in ["MS","SM"] and d2 in ["MS","SM"]
 
 def part1(data):
     print(f"{len(data)}x{len(data[0])}")
@@ -26,7 +24,7 @@ def part1(data):
     diagonal = diagonalize(data)
     for line in diagonal:
         count += line.count(key) + line[::-1].count(key)
-    #Create backward diagonal /
+    #Create backward diagonal / by flipping the grid vertically first
     diagonal = diagonalize(data[::-1])
     for line in diagonal:
         count += line.count(key) + line[::-1].count(key)
