@@ -88,7 +88,7 @@ def part2_multi(grid, path):
     path.discard(start)
     with mp.Pool(mp.cpu_count()) as pool:
         tasks = pool.imap_unordered(m_simulate,states())
-        return print(f"Part 2b: {sum(tqdm(tasks, total=len(visited)))}",end="")
+        return sum(tasks)
 
 if __name__ == "__main__":
     with open("input.txt") as file:
@@ -101,4 +101,4 @@ if __name__ == "__main__":
     print(f"Part 2: {res2} -- {time.perf_counter()-start:.4f} s")
     start = time.perf_counter()
     res2 = part2_multi(data, visited)
-    print(f" -- {time.perf_counter()-start:.4f} s")
+    print(f"Part 2 - Multiprocessing: {res2} -- {time.perf_counter()-start:.4f} s")
