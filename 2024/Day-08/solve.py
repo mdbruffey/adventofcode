@@ -27,30 +27,6 @@ class Vec():
     def __str__(self):
         return f"({self.x},{self.y})"
 
-class Line():
-    def __init__(self, pt1, pt2):
-        if pt1.x > pt2.x:
-            pt1, pt2 = pt2, pt1
-        self.rise = pt2.y-pt1.y
-        self.run = pt2.x-pt1.x
-        self.pt = pt1
-        self.b = pt1.y - self.rise/self.run*pt1.x
-
-    def get_points(self,grid):
-        upper_y = len(grid)
-        upper_x = len(grid[0])
-        points = []
-        for x in range(upper_x):
-            y = self.rise/self.run*x + self.b
-            if y >= upper_y or y < 0:
-                continue
-            if math.isclose(y,int(y),abs_tol=0.05):
-                points.append((x,int(y)))
-        return points
-
-    def __str__(self):
-        return f"y = {self.rise/self.run}x + {self.b}"
-
 def get_points(pt1, pt2, grid):
     dx = pt2.x-pt1.x
     dy = pt2.y-pt1.y
@@ -103,15 +79,6 @@ def part2(data):
         for i in range(len(ants)):
             for j in range(i+1,len(ants)):
                 antinodes.update(get_points(ants[i],ants[j],data))
-
-    """for y in range(len(data)):
-        for x in range(len(data[0])):
-            char = data[y][x]
-            if (x,y) in antinodes:
-                print("#",end="")
-            else:
-                print(data[y][x],end="")
-        print()"""
     
     return len(antinodes)
 
