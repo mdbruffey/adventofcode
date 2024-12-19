@@ -44,7 +44,7 @@ def get_neighbors(pos, grid, size):
 
 def part1(data):
     fallen = 1024
-    grid = data[:fallen]
+    grid = set(data[:fallen])
     grid_size = 71
     start = (0,0)
     end = (grid_size-1,grid_size-1)
@@ -71,12 +71,12 @@ def part1(data):
 def part2(data, size):
     fallen = 1024
     incoming = data[fallen:]
-    path = get_path(data[:fallen],size)
+    path = get_path(set(data[:fallen]),size)
     #this is probably not the best approach. Making part 1 faster
     #would also benefit this, I suppose
     for i in range(len(incoming)): 
         if incoming[i] in path:
-            path = get_path(data[:fallen+i+1],size)
+            path = get_path(set(data[:fallen+i+1]),size)
             if not path:
                 return f"{incoming[i][0]},{incoming[i][1]}"
 
