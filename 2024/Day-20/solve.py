@@ -41,7 +41,7 @@ def find_path(start, end, walls, size, ignore=None):
         path.append(curr)
         curr = comes_from[curr]
     path.reverse()
-    return path, cost_till_now
+    return path
 
 def part1(data):
     cheat_time = 2
@@ -56,38 +56,44 @@ def part1(data):
                 start = (j,i)
             elif data[i][j] == "E":
                 end = (j,i)
-    path, cost_till_now  = find_path(start, end, walls, size)
-    saved_times = {}
-    for i in range(len(path)-cutoff-cheat_time):
-        for j in range(i+cutoff+cheat_time,len(path)):
+    path = find_path(start, end, walls, size)
+    count = 0
+    i = 0
+    while i < len(path)-cutoff:
+        j = i+cutoff
+        while j < len(path):
             distance = manhattan(path[i],path[j])
             if distance <= cheat_time:
-                time_saved = cost_till_now[path[j]] - cost_till_now[path[i]] - distance
-                saved_times[time_saved] = saved_times.get(time_saved, 0) + 1
+                count += j - i - distance >= cutoff
+                j += 1
+            else:
+                j += distance - cheat_time
+        i += 1
+    return count, path
 
-
-    return sum([saved_times[key] for key in saved_times if key >= cutoff]), path, cost_till_now
-
-
-def part2(path, cost_till_now):
+def part2(path):
     cutoff = 100
     cheat_time = 20
-    saved_times = {}
-    for i in range(len(path)-cutoff):
-        for j in range(i+cutoff,len(path)):
+    count = 0
+    i = 0
+    while i < len(path)-cutoff:
+        j = i+cutoff
+        while j < len(path):
             distance = manhattan(path[i],path[j])
             if distance <= cheat_time:
-                time_saved = cost_till_now[path[j]] - cost_till_now[path[i]] - distance
-                saved_times[time_saved] = saved_times.get(time_saved, 0) + 1
-    print(max(saved_times.keys()))
-    return sum([saved_times[key] for key in saved_times if key >= cutoff])
+                count += j - i - distance > cutoff
+                j += 1
+            else:
+                j += distance - cheat_time
+        i += 1
+    return count
 
 with open("input.txt") as file:
     data = file.read().splitlines()
 
 start = time.perf_counter()
-res1, path, cost_till_now = part1(data)
+res1, path = part1(data)
 print(f"Part 1: {res1} -- {time.perf_counter()-start:.4f} s")
 start = time.perf_counter()
-res2 = part2(path, cost_till_now)
+res2 = part2(path)
 print(f"Part 2: {res2} -- {time.perf_counter()-start:.4f} s")
