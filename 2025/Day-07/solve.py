@@ -30,6 +30,19 @@ def part2(data):
             paths[(j,i)] = left_path + center_path + right_path
     return sum([paths[pos] for pos in row]) + sum([paths[pos] for pos in prev if data[pos[1]][pos[0]] == "."])
 
+def part2_v2(data):
+    beams = {}
+    for i in range(len(data[0])):
+        beams[i] = 0
+    beams[data[0].find("S")] = 1
+    for i in range(2, len(data), 2):
+        for j in range(len(data[i])):
+            if data[i][j] == "^":
+                beams[j-1] += beams[j]
+                beams[j+1] += beams[j]
+                beams[j] = 0
+    return sum(beams.values())
+
 
 with open("input.txt") as file:
     data = file.readlines()
@@ -40,3 +53,6 @@ print(f"Part 1: {res1} -- {time.perf_counter()-start:.4f} s")
 start = time.perf_counter()
 res2 = part2(data)
 print(f"Part 2: {res2} -- {time.perf_counter()-start:.4f} s")
+start = time.perf_counter()
+res3 = part2_v2(data)
+print(f"Part 2 v.2: {res3} -- {time.perf_counter()-start:.4f} s")
