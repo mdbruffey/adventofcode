@@ -5,6 +5,8 @@ import itertools
 def is_contained(c1, c2, edges):
     x1, y1 = c1
     x2, y2 = c2
+    c3 = (x1, y2)
+    c4 = (x2, y1)
 
     # The four sides. The directions aren't really true necessarily, 
     # but it doesn't really matter
@@ -18,24 +20,45 @@ def is_contained(c1, c2, edges):
         for edge in edges:
             if intersects(side, edge):
                 return False
+    if is_outside(c3, edges) or is_outside(c4, edges):
+        return False
+    
     return True
 
 def intersects(side, edge):
     if side[0] == side[1]: #side is vertical
         return (
             edge[2] == edge[3] and #edge is horizontal
-            edge[2] >= min(side[2:]) and edge[2] <= max(side[2:]) and #edge y-value is within the y-range of the side
-            side[0] >= min(edge[:2]) and side[0] <= max(edge[:2]) and #side x value is within the x-range of the edge
-            not (side[2] == edge[2] or side[3] == edge[2])            #side does not terminate on the edge
+            edge[2] > min(side[2:]) and edge[2] < max(side[2:]) and #edge y-value is within the y-range of the side
+            side[0] > min(edge[:2]) and side[0] < max(edge[:2]) #side x value is within the x-range of the edge
         )
                
     else: #side is horizontal
         return (
             edge[0] == edge[1] and #edge is vertical
-            edge[0] >= min(side[:2]) and edge[0] <= max(side[:2]) and #edge x value is within the x-range of the side
-            side[2] >= min(edge[2:]) and side[2] <= max(edge[2:]) and #side y value is within the y-range of the edge
-            not (side[0] == edge[0] or side[1] == edge[0])            #side does not terminate on the edge
+            edge[0] > min(side[:2]) and edge[0] < max(side[:2]) and #edge x value is within the x-range of the side
+            side[2] > min(edge[2:]) and side[2] < max(edge[2:]) #side y value is within the y-range of the edge
         )
+    
+def is_outside(c, edges):
+    x, y = c
+    intersections = [0,0,0,0]
+    #I'm just going to look in all four directions. If I don't intersect any edges in a direction, the point is outside
+    #look right
+    for edge in edges:
+        #check if there are any intersections to the right of the point
+        if edge[0] >= x and edge[0] == edge[1] and max(edge[2:]) >= y and min(edge[2:]) <= y:
+            intersections[0] += 1
+        #check if there are any intersections to the left of the point
+        elif edge[0] <= x and edge[0] == edge[1] and max(edge[2:]) >= y and min(edge[2:]) <= y:
+            intersections[1] += 1
+        #check if there are any intersections above the point
+        elif edge[2] >= y and edge[2] == edge[3] and max(edge[:2]) >= x and min(edge[:2]) <= x:
+            intersections[2] += 1
+        #check if there are any intersections below the point
+        elif edge[2] <= y and edge[2] == edge[3] and max(edge[:2]) >= x and min(edge[:2]) <= x:
+            intersections[3] += 1
+    return 0 in intersections
 
 def part1(vertices):
     vals = [(sum(vertex), vertex) for vertex in vertices]
