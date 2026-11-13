@@ -25,7 +25,7 @@ def part1(grid):
     return count
 
 def part2(grid):
-    bursts = 10000
+    bursts = 10000000
     infected = set()
     weakened = set()
     flagged = set()
@@ -42,6 +42,7 @@ def part2(grid):
             infected.remove(curr)
             flagged.add(curr)
         elif curr in weakened:
+            weakened.remove(curr)
             infected.add(curr)
             count += 1
         elif curr in flagged:
