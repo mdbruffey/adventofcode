@@ -11,8 +11,22 @@ def part1(rectangles):
         seen.update(points)
     return len(overlapped)
 
+def overlaps(rect, rectangles):
+    ax, ay = rect["coords"]
+    aw, ah = rect["dims"]
+    for r in rectangles:
+        if r["id"] == rect["id"]:
+            continue
+        bx, by = r["coords"]
+        bw, bh = r["dims"]
+        if not (ax + aw <= bx or ay+ah <= by or bx+bw <= ax or by+bh <= ay):
+            return True
+
 def part2(rectangles):
-    
+    for rect in rectangles:
+        if not overlaps(rect, rectangles):
+            return rect["id"]
+    return None
 
 with open("input.txt") as file:
     data = file.read().split("\n")
